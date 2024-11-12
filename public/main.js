@@ -12,7 +12,7 @@ loginPage.style.display = 'flex';
 chatPage.style.display = 'none';
 
 function renderUserList() {
-  let url = document.querySelector('.userList');
+  let ul = document.querySelector('.userList');
   ul.innerHTML = '';
 
   userList.forEach(i => {
