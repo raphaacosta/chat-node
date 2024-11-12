@@ -1,8 +1,8 @@
 {
   "name": "chat-node",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Socket PDP Activity",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.1",
+    "nodemon": "^3.1.7",
     "socket.io": "^4.8.1"
   }
 }
