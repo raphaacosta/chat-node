@@ -1,49 +1,40 @@
 const express = require('express');
-const path = require('path');
 const http = require('http');
-const { Server } = require('socket.io');
+const socketIO = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = socketIO(server);
 
-server.listen(3000);
+const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
-let connectedUsers = [];
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+app.get('/chat/:room', (req, res) => {
+  res.sendFile(__dirname + '/public/chat.html');
+});
 
 io.on('connection', (socket) => {
-  console.log("Conexão detectada...");
+  console.log('Usuário conectado');
 
-  socket.on('join-request', (username) => {
-    socket.username = username;
-    connectedUsers.push(username);
-    console.log(connectedUsers);
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log(`Alguém se conectou à sala ${room}`);
+  });
 
-    socket.emit('user-ok', connectedUsers);
-    socket.broadcast.emit('list-update', {
-      joined: username,
-      list: connectedUsers
-    });
+  socket.on('chatMessage', (data) => {
+    io.to(data.room).emit('chatMessage', data.message);
   });
 
   socket.on('disconnect', () => {
-    connectedUsers = connectedUsers.filter(user => user != socket.username);
-    console.log(connectedUsers);
-
-    socket.broadcast.emit('list-update', {
-      left: socket.username,
-      list: connectedUsers
-    });
-  });
-
-  socket.on('send-msg', (txt) => {
-    let obj = {
-      username: socket.username,
-      message: txt
-    };
-
-    socket.broadcast.emit('show-msg', obj);
+    console.log('Usuário desconectado');
   });
 });
+
+server.listen(PORT, () => {
+  console.log(`Server running on port: ${PORT}`);
+})

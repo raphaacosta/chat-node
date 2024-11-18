@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+  <!-- <link rel="stylesheet" href="chat.css"> -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .header-div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 80px;
+    }
+
+    h1 {
+      color: #C71585;
+    }
+
+    .chat-inputs-div {
+      width: 80%;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+
+    #messages {
+      list-style-type: none;
+      padding: 10px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: none;
+      border-radius: 8px;
+    }
+
+    #messages li {
+      margin: 5px 0;
+    }
+
+    #inputMessage {
+      width: 70%;
+      height: 40px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background-color: #F5F5F5F5;
+    }
+
+    button {
+      padding: 10px 20px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      color: #FFFFFF;
+      background-color: #324AB2;
+      cursor: pointer;
+    }
+
+    #backButton {
+      margin-right: 50px;
+    }
+
+    button:hover {
+      background-color: #C71585;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header-div">
+    <button id="backButton" onclick="window.location.href = '/'">Voltar</button>
+    <h1>Bem-vindo à Sala de Chat</h1>
+  </div>
+  <ul id="messages"></ul>
+  <div class="chat-inputs-div">
+    <input id="inputMessage" type="text" placeholder="Digite sua mensagem..." />
+    <button id="sendButton">Enviar</button>
+  </div>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const room = window.location.pathname.split('/')[2];
+    const messagesList = document.getElementById('messages');
+    const inputMessage = document.getElementById('inputMessage');
+    const sendButton = document.getElementById('sendButton');
+
+    socket.emit('joinRoom', room);
+
+    socket.on('chatMessage', (message) => {
+      const li = document.createElement('li');
+      li.textContent = message;
+      messagesList.appendChild(li);
+    });
+
+    sendButton.addEventListener('click', () => {
+      const message = inputMessage.value;
+      if (message.trim()) {
+        socket.emit('chatMessage', { room, message });
+        inputMessage.value = '';
+      }
+    });
+  </script>
+</body>
+
+</html>
